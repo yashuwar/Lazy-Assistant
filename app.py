@@ -1,32 +1,30 @@
 import face_recognition
 import cv2
-cv2.destroyAllWindows()
 import numpy as np
-
-original_image = face_recognition.load_image_file('/home/pi/1.jpg')
-original_image = cv2.resize(original_image, (1000, 1000)).reshape(1000, 1000, 3)
-original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
-
-original_encodings = face_recognition.face_encodings(original_image)[0]
-
-from tensorflow import keras
-
 from warnings import filterwarnings as fw
 fw('ignore')
 
+original_image = face_recognition.load_image_file('1.jpg')
+original_image = cv2.resize(original_image, (1000, 1000)).reshape(1000, 1000, 3)
+original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+
+from tensorflow import keras
 model = keras.models.load_model('chat.h5')
 
 import json
 import random
-import numpy as np
 
 from nltk import word_tokenize
 
 from nltk.stem import WordNetLemmatizer as WNL
 lemmatizer = WNL()
 
+# nltk.download('punkt'); nltk.download('wordnet') - use this in case the punkt and wordnet data hasn't been downloaded yet.
+
 from gpiozero import LED
+# gpiozero is a python3 library to interact with the gpio pins present in the pi.
 led = LED(27)
+# for some reason, led.on() is equivalent to turning off the led connected to the gpio and led.off() is equivalent to turning it on XP.
 led.on()
 
 with open('intents.json', 'r') as f:
@@ -38,14 +36,18 @@ with open('words.json', 'r') as f:
 with open('classes.json', 'r') as f:
     classes = json.load(f)
 
-face_classifier = cv2.CascadeClassifier('/home/pi/Downloads/haarcascade_frontalface_default.xml')
+face_classifier = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
+#this function makes the red box you see when the video is turned on.
 def maker(gray, frame):
     faces = face_classifier.detectMultiScale(gray, 1.3, 5)
     for (x,y,w,h) in faces:
         cv2.rectangle(frame, (x,y), (x+w,y+h), (0,0,255), 2)
     
     return frame, faces
+
+# below function recognizes if the owner is present in the frame or not.
+original_encodings = face_recognition.face_encodings(original_image)[0]
 
 def recognize_face(frame):
     faces = face_classifier.detectMultiScale(frame, 1.3, 5)
@@ -59,14 +61,17 @@ def recognize_face(frame):
         dis = face_recognition.face_distance([original_encodings], new_encodings)
         return result, dis
 
+#function to word tokenize sentences.
 def tokenize(sentence):
     return word_tokenize(sentence)
 
+#function to tokenize and lemmatize the provided sentence.
 def clean_up_sentence(sentence):
     sentence_words = tokenize(sentence)
     sentence_words = [lemmatizer.lemmatize(word) for word in sentence_words]
     return sentence_words
 
+#function to return the bag of words which we have used in this project insted of tfidf, word2vec or any other technique
 def bag_of_words(sentence):
     sentence_words = clean_up_sentence(sentence)
     bag = [0] * len(words)
@@ -76,6 +81,7 @@ def bag_of_words(sentence):
                 bag[i] = 1
     return np.array(bag)
 
+#function to predict the class and sort out the classes on basis of preference.
 def predict_class(sentence):
     bow = bag_of_words(sentence)
     res = model.predict(np.array([bow]))[0]
@@ -90,6 +96,7 @@ def predict_class(sentence):
         
     return return_list
 
+#function to get response of the chatbot.
 def get_response(intents_list, intents_json):
     tag = intents_list[0]['intent']
     list_of_intents = intents_json['intents']
@@ -110,13 +117,16 @@ def get_response(intents_list, intents_json):
     return tag, result
 
 video_capture = cv2.VideoCapture(0)
+#we set a flag that decides if the chatbot needs to be activated. flag==0 means no activation is needed and flag==1 means chatbot needs to be activated.    
 flag = 0
+
+#this is the main piece of code, which displays the main functioning.
 
 while True:
     
     showing, image =  video_capture.read()
     # To keep the video capture on since this was giving an error
-    # earlier, becuase video_capture was already intialized.
+    # earlier, becuase video_capture was already intialized even though the code wasn't run properly -_-.
     if showing == False:
         continue
     
@@ -150,6 +160,7 @@ while True:
             print("You are not Yashwardhan.")
             break
         
+    # Doesn't work on my device if I press 'q', I don't know why yet XD.
     elif cv2.waitKey(1) & 0xFF == ord('q'):
         break
     
@@ -158,6 +169,7 @@ video_capture.release()
 
 if flag==1:
     
+    # Yes, we can name the bot XD.
     bot = str(input('Enter bot name please: '))
     
     while True:
