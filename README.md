@@ -1,6 +1,15 @@
 ---
 # Lazy-Assistant
-This is a simple project that I initiated back February 2021, which was initiated with the aim of learning something new and applying the knowledge I have gained to automation tasks (yes, I am a lazy guy who loves automating things XD). The automation, till now, is only restricted to a simple toggling off and on of an LED bulb with a raspberry pi using a chatbot interface. Originally, the chatbot was developed with the help of pytorch, but since pytorch was not working on the raspberry pi , I migrated to keras. I will try to give you a brief description of the files included this respository below.
+This is a simple project that I initiated back February 2021, which was initiated with the aim of learning something new and applying the knowledge I have gained to automation tasks (yes, I am a lazy guy who loves automating things XD). The automation, till now, is only restricted to a simple toggling off and on of an LED bulb with a raspberry pi using a chatbot interface. Originally, the chatbot was developed with the help of pytorch, but since pytorch was not working on my raspberry pi, I migrated to keras. 
+
+What can this app do?
+* It can indentify if you are it's owner.
+* It can interact with you as a chatbot.
+* It can help you automate your tasks.
+
+Sounds simple doesn't it? It is! The development wasn't XP.
+
+Anyway, I will try to give you a brief description of the files included this respository below.
 
 ---
 ## Files in this respository:
@@ -14,5 +23,3 @@ This is a simple project that I initiated back February 2021, which was initiate
 I will share the source code for model development soon, since the code is not yet presentable.
 
 ---
-### Development:
-The development of the app started in February 2021, for which my lack of knowledge served to be the afflatus. Even though I am not a complete expert, I can say I'm better than before at least, haha XD. Anyway, I'll try to give you a sense of the development process. 
