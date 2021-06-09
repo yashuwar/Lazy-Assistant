@@ -2,6 +2,7 @@ import face_recognition
 import cv2
 import speech_recognition as sr
 import pyaudio
+import pyttsx3
 cv2.destroyAllWindows()
 import numpy as np
 
@@ -111,6 +112,12 @@ def get_response(intents_list, intents_json):
                     result = random.choice(i['responses'])
     return tag, result
 
+engine = pyttsx3.init()
+
+def talk(command):
+    engine.say(command)
+    engine.runAndWait()
+
 video_capture = cv2.VideoCapture(0)
 flag = 0
 
@@ -171,6 +178,7 @@ if flag==1:
                 ints = predict_class(command)
                 tag, res = get_response(ints, intents)
                 print(f"You: {command}")
+                talk(res)
                 if tag == 'goodbye':
                     print(f'{bot}: {res}')
                     break
